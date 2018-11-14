@@ -1,0 +1,70 @@
+---
+Parameters:
+  Name:
+    Type: String
+  AuthorizationType: 
+    Type: String
+  HttpMethod:
+    Type: String
+  StageName:
+    Type: String
+Resources:
+  restapitest:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name:
+        Ref: Name
+  
+  # restapiresource:
+  #   Type: AWS::ApiGateway::Resource
+  #   Properties:
+  #     RestApiId: Fn:!Ref restapitest
+  #     ParentId: Fn:!GetAtt  restapitest.RootResourceId
+  #     PathPart: "stack"
+  #   DependsOn:
+  #     - restapitest
+
+  restapimethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType:
+        Ref: AuthorizationType
+      HttpMethod:
+        Ref: HttpMethod
+      ResourceId: Fn:!Ref  restapitest.RootResourceId
+      RestApiId: Fn:!Ref restapitest
+    DependsOn:
+      - restapitest
+      # - restapiresource
+  
+  restapideployment:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId:
+          Ref: restapitest
+    DependsOn:
+      - restapimethod
+      - restapitest
+
+  restapistage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId:
+        Fn:!Ref restapitest
+      StageName: 
+        Ref: StageName
+      DeploymentId:
+        Fn:!Ref restapideployment
+    DependsOn:
+      - restapideployment
+
+Outputs:
+  RestApiId:
+    Value:
+      Ref: restapitest
+  # RestApigetMethod:
+  #   Value:
+  #     Ref: restapimethod
+  RestApiStage:
+    Value:
+      Ref: restapistage

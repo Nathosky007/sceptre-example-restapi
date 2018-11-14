@@ -1,0 +1,6 @@
+template_path: templates/rest-api.yaml
+parameters:
+    Name: "restapi-example"
+    AuthorizationType: "NONE"
+    HttpMethod: GET
+    StageName: "dev"
