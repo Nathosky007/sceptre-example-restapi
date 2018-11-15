@@ -15,14 +15,16 @@ Resources:
       Name:
         Ref: Name
   
-  # restapiresource:
-  #   Type: AWS::ApiGateway::Resource
-  #   Properties:
-  #     RestApiId: Fn:!Ref restapitest
-  #     ParentId: Fn:!GetAtt  restapitest.RootResourceId
-  #     PathPart: "stack"
-  #   DependsOn:
-  #     - restapitest
+  restapiresource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: 
+        !Ref restapitest
+      ParentId: 
+        !GetAtt  restapitest.RootResourceId
+      PathPart: "stack"
+    DependsOn:
+      - restapitest
 
   restapimethod:
     Type: AWS::ApiGateway::Method
@@ -31,11 +33,15 @@ Resources:
         Ref: AuthorizationType
       HttpMethod:
         Ref: HttpMethod
-      ResourceId: Fn:!Ref  restapitest.RootResourceId
-      RestApiId: Fn:!Ref restapitest
+      ResourceId: 
+        !Ref restapiresource 
+      RestApiId: 
+        !Ref restapitest
+      Integration:
+        Type: MOCK
     DependsOn:
       - restapitest
-      # - restapiresource
+      - restapiresource
   
   restapideployment:
     Type: AWS::ApiGateway::Deployment
@@ -50,11 +56,11 @@ Resources:
     Type: AWS::ApiGateway::Stage
     Properties:
       RestApiId:
-        Fn:!Ref restapitest
+        !Ref restapitest
       StageName: 
         Ref: StageName
       DeploymentId:
-        Fn:!Ref restapideployment
+        !Ref restapideployment
     DependsOn:
       - restapideployment
 
@@ -62,9 +68,9 @@ Outputs:
   RestApiId:
     Value:
       Ref: restapitest
-  # RestApigetMethod:
-  #   Value:
-  #     Ref: restapimethod
+  RestApigetMethod:
+    Value:
+      Ref: restapimethod
   RestApiStage:
     Value:
       Ref: restapistage
